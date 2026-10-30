@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Book an appointment</h1>
+<p class="lede">Northgate, Riverside and Eastview clinics. Takes about a minute.</p>
+{% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+
+<form method="post" action="/book" id="booking">
+  <div class="card">
+    <div class="step">1 · What do you need?</div>
+    <div class="choices">
+      {% for name, info in visit_types.items() %}
+      <label class="choice"><input type="radio" name="visit_type" value="{{ name }}" required
+             {% if form.get('visit_type') == name %}checked{% endif %}>
+        <span>{{ name }}<small>{{ info.minutes }} min</small></span></label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step">2 · Which clinic?</div>
+    <div class="choices" id="clinics">
+      {% for code, name in clinics.items() %}
+      <label class="choice"><input type="radio" name="clinic_code" value="{{ code }}" required
+             {% if form.get('clinic_code') == code %}checked{% endif %}>
+        <span>{{ name }}<small class="offers"></small></span></label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="step">3 · Pick a time</div>
+    <p class="muted" id="slot-hint">Choose what you need and a clinic to see open times.</p>
+    <div class="days" id="days"></div>
+    <div class="times" id="times"></div>
+    <input type="hidden" name="slot_id" id="slot_id">
+    <p class="muted hidden" id="none">No open times in the next few weeks. Join the waitlist below and
+      we'll email you the moment one opens up.</p>
+  </div>
+
+  <div class="card">
+    <div class="step">4 · Your details</div>
+    <label for="full_name">Full name</label>
+    <input id="full_name" name="full_name" autocomplete="name" required value="{{ form.get('full_name', '') }}">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" required value="{{ form.get('email', '') }}">
+    <label for="phone">Mobile</label>
+    <input id="phone" name="phone" type="tel" autocomplete="tel" required placeholder="212-555-0142"
+           value="{{ form.get('phone', '') }}">
+    <div class="actions">
+      <button class="primary" type="submit">Book appointment</button>
+      <button class="link" type="submit" formaction="/waitlist" formnovalidate id="join">
+        No time that works? Join the waitlist</button>
+    </div>
+  </div>
+</form>
+
+<script>
+  const offering = {{ offering | tojson }};
+  const form = document.getElementById("booking");
+  const daysEl = document.getElementById("days"), timesEl = document.getElementById("times");
+  const slotInput = document.getElementById("slot_id"), hint = document.getElementById("slot-hint");
+  const noneEl = document.getElementById("none");
+  let days = [];
+
+  function value(name) { const el = form.querySelector(`[name=${name}]:checked`); return el && el.value; }
+
+  function updateClinics() {
+    const vt = value("visit_type");
+    form.querySelectorAll("[name=clinic_code]").forEach(input => {
+      const ok = !vt || offering[vt].includes(input.value);
+      input.disabled = !ok;
+      if (!ok) input.checked = false;
+      input.parentElement.querySelector(".offers").textContent = vt && !ok ? `No ${vt.toLowerCase()} here` : "";
+    });
+  }
+
+  function showDay(i) {
+    daysEl.querySelectorAll("button").forEach((b, j) => b.classList.toggle("sel", i === j));
+    timesEl.innerHTML = "";
+    days[i].slots.forEach(s => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = `${s.time}<small>${s.provider}</small>`;
+      b.onclick = () => {
+        timesEl.querySelectorAll("button").forEach(x => x.classList.remove("sel"));
+        b.classList.add("sel");
+        slotInput.value = s.slot_id;
+      };
+      timesEl.appendChild(b);
+    });
+  }
+
+  async function loadSlots() {
+    updateClinics();
+    const vt = value("visit_type"), clinic = value("clinic_code");
+    slotInput.value = ""; daysEl.innerHTML = ""; timesEl.innerHTML = "";
+    noneEl.classList.add("hidden");
+    if (!vt || !clinic) { hint.classList.remove("hidden"); return; }
+    hint.textContent = "Loading open times…";
+    const res = await fetch(`/api/slots?clinic=${clinic}&visit_type=${encodeURIComponent(vt)}`);
+    days = (await res.json()).days;
+    hint.classList.add("hidden");
+    if (!days.length) { noneEl.classList.remove("hidden"); return; }
+    days.forEach((d, i) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = d.label; b.onclick = () => showDay(i);
+      daysEl.appendChild(b);
+    });
+    showDay(0);
+  }
+
+  form.addEventListener("change", e => {
+    if (e.target.name === "visit_type" || e.target.name === "clinic_code") loadSlots();
+  });
+  form.addEventListener("submit", e => {
+    if (e.submitter && e.submitter.id === "join") {
+      if (!value("visit_type") || !value("clinic_code")) { e.preventDefault(); alert("Choose what you need and a clinic first."); }
+      return;
+    }
+    if (!slotInput.value) { e.preventDefault(); alert("Please pick a time."); return; }
+    // stop a double-click from sending the booking twice
+    form.querySelectorAll("button[type=submit]").forEach(b => b.disabled = true);
+    if (e.submitter) e.submitter.textContent = "Booking…";
+  });
+  loadSlots();
+</script>
+{% endblock %}

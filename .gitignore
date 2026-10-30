@@ -1,0 +1,36 @@
+# Secrets — never commit
+.env
+*.key
+*_key.json
+*credentials*.json
+service-account*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Generated locally: fake data, emails, logs
+data/
+outbox/
+logs/
+
+# Intermediate file for flowchart.png (scripts/make_flowchart.py)
+flowchart.html
+
+# Kept locally, not published: fake-data generation, database setup and build tooling
+seed/
+sql/schema.sql
+metabase/
+docker-compose.yml
+scripts/send_test_emails.py
+scripts/make_flowchart.py
+
+# Uncropped screenshots (show the Gmail account): kept locally
+screenshots/originals/

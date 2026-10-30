@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Book an appointment{% endblock %} · Brightside Family Health</title>
+  <style>
+    :root {
+      --ink: #1d2a33; --muted: #6b7780; --line: #dde3e7; --bg: #f5f8f9; --card: #fff;
+      --brand: #0f766e; --brand-soft: #e3f2f0; --danger: #b42318; --danger-soft: #fdecea;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+           color: var(--ink); background: var(--bg); }
+    header { background: var(--card); border-bottom: 1px solid var(--line); }
+    header .in, main { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+    header .in { display: flex; align-items: center; gap: 10px; height: 60px; }
+    header a { color: var(--brand); font-weight: 700; text-decoration: none; font-size: 18px; }
+    .dot { width: 26px; height: 26px; border-radius: 50%; background: var(--brand);
+           box-shadow: inset 0 0 0 7px var(--brand-soft); }
+    main { padding-top: 28px; padding-bottom: 60px; }
+    h1 { font-size: 26px; margin: 0 0 6px; }
+    .lede { color: var(--muted); margin: 0 0 24px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+            padding: 20px; margin-bottom: 16px; }
+    .step { font-size: 13px; font-weight: 600; color: var(--brand); text-transform: uppercase;
+            letter-spacing: .04em; margin-bottom: 10px; }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; }
+    input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px;
+                    font: inherit; background: #fff; color: inherit; }
+    input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: transparent; }
+    .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    .choice { position: relative; }
+    .choice input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+    .choice span { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
+                   cursor: pointer; }
+    .choice small { display: block; color: var(--muted); font-size: 13px; }
+    .choice input:checked + span { border-color: var(--brand); background: var(--brand-soft);
+                                   box-shadow: 0 0 0 1px var(--brand); }
+    .choice input:disabled + span { opacity: .45; cursor: not-allowed; }
+    .choice input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+    .days button { flex: 0 0 auto; }
+    .times { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
+    button, .btn { font: inherit; font-weight: 600; border-radius: 9px; padding: 11px 18px; cursor: pointer;
+                   border: 1px solid var(--line); background: #fff; color: var(--ink); text-decoration: none;
+                   display: inline-block; text-align: center; }
+    button.sel, .times button.sel { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .times button small { display: block; font-weight: 400; font-size: 12px; opacity: .8; }
+    .primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+    .link { background: none; border: none; color: var(--brand); padding: 0; text-decoration: underline; }
+    .muted { color: var(--muted); }
+    .error { background: var(--danger-soft); color: var(--danger); padding: 12px 14px; border-radius: 10px;
+             margin-bottom: 16px; }
+    dl { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; margin: 0; }
+    dt { color: var(--muted); }
+    dd { margin: 0; font-weight: 600; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .hidden { display: none; }
+    footer { color: var(--muted); font-size: 13px; text-align: center; padding: 20px 16px; }
+  </style>
+</head>
+<body>
+  <header><div class="in"><div class="dot"></div><a href="/">Brightside Family Health</a></div></header>
+  <main>{% block body %}{% endblock %}</main>
+  <footer>Brightside Family Health is a fictional clinic in a portfolio project. Please don't enter real health information.</footer>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+<h1>{{ title }}</h1>
+{% if note %}<p class="lede">{{ note }}</p>{% endif %}
+<div class="card">
+  <dl>
+    <dt>When</dt><dd>{{ appt.when }}</dd>
+    <dt>What</dt><dd>{{ appt.what }}</dd>
+    <dt>With</dt><dd>{{ appt.who }}</dd>
+    <dt>Where</dt><dd>{{ appt.where }}</dd>
+    {% if appt.status %}<dt>Status</dt><dd>{{ appt.status }}</dd>{% endif %}
+  </dl>
+  {% if action %}
+  <form method="post" class="actions"><button class="{{ action.kind }}" type="submit">{{ action.label }}</button></form>
+  {% endif %}
+</div>
+{% if rebook %}<a class="btn" href="/">Book another time</a>{% endif %}
+{% endblock %}
